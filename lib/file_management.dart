@@ -6,13 +6,17 @@ import 'package:flutter/services.dart' show rootBundle;
 
 class FileManagement {
 
-  static String readRandomFileLine(String fileName) {
-    final file = new File(fileName);
-    final _random = new Random();
+  static Future<String> readRandomFileLine(String fileName) async {
+    String fullText = await rootBundle.loadString(fileName);
+    List<String> lines = fullText.split("\n");
 
-    List<String> lines = file.readAsLinesSync();
-    
+    Random _random = new Random();
+
     return lines[_random.nextInt(lines.length)];
+
+  }
+  static Future<String> readFile(String fileName) async {
+    return await rootBundle.loadString(fileName);
   }
 
 }

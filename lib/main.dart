@@ -24,6 +24,7 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> {
   final _savedQuotes = Set<String>();  
+  String _quoteToWrite = "";
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +45,10 @@ class HomeState extends State<Home> {
 
   Widget _buildQuote() {
     //add favorite button
-    final quoteToWrite = _getRandomQuote();
-
-    bool alreadySaved = _savedQuotes.contains(quoteToWrite);
+    bool alreadySaved = _savedQuotes.contains(_quoteToWrite);
 
     return ListTile(
-      title: Text(quoteToWrite),
+      title: Text(_quoteToWrite),
       trailing: Icon(
         alreadySaved ? Icons.favorite : Icons.favorite_border,
         color: alreadySaved ? Colors.red : null,
@@ -57,18 +56,28 @@ class HomeState extends State<Home> {
       onTap: () {
         setState(() {
           if (alreadySaved) {
-            _savedQuotes.remove(quoteToWrite);
+            _savedQuotes.remove(_quoteToWrite);
           } else {
-            _savedQuotes.add(quoteToWrite);
+            _savedQuotes.add(_quoteToWrite);
           }
         });
       },
     );
   }
 
-  String _getRandomQuote() {
-    return FileManagement.readRandomFileLine('assets/quotes.txt');
-    //return 'Eat Booty';
+  @override
+  void initState() {
+    super.initState();
+    _getRandomQuote().then((String text) {
+      setState(() {
+        _quoteToWrite = text;
+        print(text);
+      });
+    });
+  }
+
+  Future<String> _getRandomQuote() {
+    return FileManagement.readRandomFileLine('assets/data/quotes.txt');
   }
 
 /*
