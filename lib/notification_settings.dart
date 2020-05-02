@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
-class NoteSet extends StatefulWidget
-{
-  @override
-  State<StatefulWidget> createState() => NoteSetState();
-}
 
-class NoteSetState extends State<NoteSet>
+class NoteSet extends StatelessWidget
 {
     @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return null;
+  Widget build(BuildContext context) {{
+    
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Saved Quotes'),
+            ),
+            
+           
+          );
+      
+  }
   }
 }
