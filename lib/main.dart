@@ -69,7 +69,8 @@ class HomeState extends State<Home> {
     //add favorite button
     bool alreadySaved = _savedQuotes.contains(_quoteToWrite);
 
-    return Center(
+    return Container(
+      alignment: Alignment(0.0, -0.3),
       child: Container(
         height: 200.0,
         color: Colors.transparent,
