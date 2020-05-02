@@ -34,9 +34,6 @@ class HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Motivation'),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),
-        ],
       ),
       backgroundColor: Colors.blueGrey[600],
       body: Container(
@@ -45,6 +42,26 @@ class HomeState extends State<Home> {
       ),
       floatingActionButton: _buildButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              child: Text('Settings'),
+              decoration: BoxDecoration(
+                color: Colors.black12,
+              ),
+            ),
+            ListTile(
+              title: Text('Notification Settings'),
+            ),
+            ListTile(
+              title: Text('Saved Quotes'),
+              onTap: _pushSaved,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -143,7 +160,7 @@ class HomeState extends State<Home> {
     _getRandomQuote().then((String text) {
       setState(() {
         _quoteToWrite = text;
-      });
+        });
     });
   }
 
