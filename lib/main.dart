@@ -160,7 +160,7 @@ class HomeState extends State<Home> {
     _getRandomQuote().then((String text) {
       setState(() {
         _quoteToWrite = text;
-        });
+      });
     });
   }
 
@@ -210,6 +210,11 @@ class HomeState extends State<Home> {
                 style: _biggerFont,
               ),
             ),
+            onLongPress: () {
+              _savedQuotes.remove(_savedQuotes.elementAt(index));
+              Navigator.of(context).pop();
+              _pushSaved();
+            },
           ),
         ),
       ),
@@ -227,10 +232,11 @@ class HomeState extends State<Home> {
             backgroundColor: Colors.blueGrey[600],
             body: ListView.separated(
               itemCount: _savedQuotes.length,
-              itemBuilder: (BuildContext context, int index) => _buildSavedItem(context, index),
+              itemBuilder: (BuildContext context, int index) =>
+                  _buildSavedItem(context, index),
               separatorBuilder: (context, index) => Divider(
-                //color: Colors.black,
-              ),
+                  //color: Colors.black,
+                  ),
             ),
           );
         },
