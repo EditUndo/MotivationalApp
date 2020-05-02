@@ -29,9 +29,7 @@ class HomeState extends State<Home> {
   final _savedQuotes = Set<String>();
   String _quoteToWrite = "";
   final _biggerFont = const TextStyle(fontSize: 20.0);
-  final _smallerFont = const TextStyle(fontSize: 18.0);
-  Color _bgColor = Colors.lightBlue[600];
-  Color _buttonColor = Colors.deepOrange[300];
+  final _smallerFont = const TextStyle(fontSize: 18.0, color: Colors.white);
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +37,13 @@ class HomeState extends State<Home> {
       appBar: AppBar(
         title: const Text('Motivation'),
       ),
-      backgroundColor: _bgColor,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          _buildQuote(),
-          _buildButton(),
-        ],
+      backgroundColor: Colors.blueGrey[600],
+      body: Container(
+        alignment: Alignment.topCenter,
+        child: _buildQuote(),
       ),
+      floatingActionButton: _buildButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -81,32 +78,70 @@ class HomeState extends State<Home> {
     bool alreadySaved = _savedQuotes.contains(_quoteToWrite);
 
     return Container(
-      height: 200.0,
-      child: ListTile(
-        title: Text(
-          _quoteToWrite,
-          style: _biggerFont,
+      alignment: Alignment(0.0, -0.3),
+      child: Container(
+        height: 200.0,
+        color: Colors.transparent,
+        padding: EdgeInsets.all(10.0),
+        child: new Container(
+          decoration: new BoxDecoration(
+              color: Colors.grey[400],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blueGrey[800],
+                  blurRadius: 10.0, // has the effect of softening the shadow
+                  spreadRadius: 1.0, // has the effect of extending the shadow
+                  offset: Offset(
+                    0.0, // horizontal, move right 10
+                    10.0, // vertical, move down 10
+                  ),
+                )
+              ],
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.blueGrey[100],
+                  Colors.blueGrey[400],
+                ], // whitish to gray
+                tileMode:
+                    TileMode.clamp, // repeats the gradient over the canvas
+              ),
+              borderRadius: new BorderRadius.only(
+                topLeft: const Radius.circular(10.0),
+                topRight: const Radius.circular(10.0),
+                bottomLeft: const Radius.circular(10.0),
+                bottomRight: const Radius.circular(10.0),
+              )),
+          child: ListTile(
+            title: new Center(
+              child: new Text(
+                _quoteToWrite,
+                style: _biggerFont,
+              ),
+            ),
+            trailing: Icon(
+              alreadySaved ? Icons.favorite : Icons.favorite_border,
+              color: alreadySaved ? Colors.red : null,
+            ),
+            onTap: () {
+              setState(() {
+                if (alreadySaved) {
+                  _savedQuotes.remove(_quoteToWrite);
+                } else {
+                  _savedQuotes.add(_quoteToWrite);
+                }
+              });
+            },
+          ),
         ),
-        trailing: Icon(
-          alreadySaved ? Icons.favorite : Icons.favorite_border,
-          color: alreadySaved ? Colors.red : null,
-        ),
-        onTap: () {
-          setState(() {
-            if (alreadySaved) {
-              _savedQuotes.remove(_quoteToWrite);
-            } else {
-              _savedQuotes.add(_quoteToWrite);
-            }
-          });
-        },
       ),
     );
   }
 
   Widget _buildButton() {
     return Container(
-      padding: EdgeInsets.only(top: 50.0, bottom: 50.0),
+      padding: EdgeInsets.only(bottom: 50.0),
       alignment: Alignment.bottomCenter,
       child: RaisedButton(
         shape: RoundedRectangleBorder(
@@ -115,7 +150,7 @@ class HomeState extends State<Home> {
         child: Text('Press For Quotes'),
         onPressed: _updateQuote,
         textColor: Colors.black,
-        color: _buttonColor,
+        color: Colors.grey[400],
       ),
     );
   }
@@ -126,37 +161,6 @@ class HomeState extends State<Home> {
     _getRandomQuote().then((String text) {
       setState(() {
         _quoteToWrite = text;
-        Random random = Random();
-        switch (random.nextInt(4)) {
-          case 1:
-            {
-              _bgColor = Colors.lightGreen[600];
-              _buttonColor = Colors.red[300];
-            }
-            break;
-
-          case 2:
-            {
-              _bgColor = Colors.orange[400];
-              _buttonColor = Colors.blue[300];
-            }
-            break;
-
-          case 3:
-            {
-              _bgColor = Colors.red[400];
-              _buttonColor = Colors.pink[300];
-            }
-            break;
-
-          case 0:
-          default:
-            {
-              _bgColor = Colors.lightBlue[600];
-              _buttonColor = Colors.deepOrange[300];
-            }
-            break;
-        }
       });
     });
   }
@@ -165,37 +169,6 @@ class HomeState extends State<Home> {
     _getRandomQuote().then((String text) {
       setState(() {
         _quoteToWrite = text;
-        Random random = Random();
-        switch (random.nextInt(4)) {
-          case 1:
-            {
-              _bgColor = Colors.lightGreen[600];
-              _buttonColor = Colors.red[300];
-            }
-            break;
-
-          case 2:
-            {
-              _bgColor = Colors.orange[400];
-              _buttonColor = Colors.blue[300];
-            }
-            break;
-
-          case 3:
-            {
-              _bgColor = Colors.red[400];
-              _buttonColor = Colors.pink[300];
-            }
-            break;
-
-          case 0:
-          default:
-            {
-              _bgColor = Colors.lightBlue[600];
-              _buttonColor = Colors.deepOrange[300];
-            }
-            break;
-        }
       });
     });
   }
@@ -204,31 +177,76 @@ class HomeState extends State<Home> {
     return FileManagement.readRandomFileLine('assets/data/quotes.txt');
   }
 
+  Widget _buildSavedItem(BuildContext context, int index) {
+    return Center(
+      child: Container(
+        color: Colors.transparent,
+        padding: EdgeInsets.all(10.0),
+        child: new Container(
+          decoration: new BoxDecoration(
+              color: Colors.grey[400],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blueGrey[800],
+                  blurRadius: 10.0, // has the effect of softening the shadow
+                  spreadRadius: 1.0, // has the effect of extending the shadow
+                  offset: Offset(
+                    0.0, // horizontal, move right 10
+                    10.0, // vertical, move down 10
+                  ),
+                )
+              ],
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.blueGrey[100],
+                  Colors.blueGrey[400],
+                ], // whitish to gray
+                tileMode:
+                    TileMode.clamp, // repeats the gradient over the canvas
+              ),
+              borderRadius: new BorderRadius.only(
+                topLeft: const Radius.circular(10.0),
+                topRight: const Radius.circular(10.0),
+                bottomLeft: const Radius.circular(10.0),
+                bottomRight: const Radius.circular(10.0),
+              )),
+          child: ListTile(
+            title: new Center(
+              child: new Text(
+                _savedQuotes.elementAt(index),
+                style: _biggerFont,
+              ),
+            ),
+            onLongPress: () {
+              _savedQuotes.remove(_savedQuotes.elementAt(index));
+              Navigator.of(context).pop();
+              _pushSaved();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   void _pushSaved() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) {
-          final Iterable<ListTile> tiles = _savedQuotes.map(
-            (String quote) {
-              return ListTile(
-                title: Text(
-                  quote,
-                  style: _smallerFont,
-                ),
-              );
-            },
-          );
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList();
-
           return Scaffold(
             appBar: AppBar(
               title: Text('Saved Quotes'),
             ),
-            backgroundColor: _bgColor,
-            body: ListView(children: divided),
+            backgroundColor: Colors.blueGrey[600],
+            body: ListView.separated(
+              itemCount: _savedQuotes.length,
+              itemBuilder: (BuildContext context, int index) =>
+                  _buildSavedItem(context, index),
+              separatorBuilder: (context, index) => Divider(
+                  //color: Colors.black,
+                  ),
+            ),
           );
         },
       ),
