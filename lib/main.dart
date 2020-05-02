@@ -36,9 +36,6 @@ class HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Motivation'),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),
-        ],
       ),
       backgroundColor: _bgColor,
       body: Column(
@@ -47,6 +44,26 @@ class HomeState extends State<Home> {
           _buildQuote(),
           _buildButton(),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              child: Text('Settings'),
+              decoration: BoxDecoration(
+                color: Colors.black12,
+              ),
+            ),
+            ListTile(
+              title: Text('Notification Settings'),
+            ),
+            ListTile(
+              title: Text('Saved Quotes'),
+              onTap: _pushSaved,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -103,27 +120,34 @@ class HomeState extends State<Home> {
         _quoteToWrite = text;
         Random random = Random();
         switch (random.nextInt(4)) {
-          case 1: {
-            _bgColor = Colors.lightGreen[600]; _buttonColor = Colors.red[300];
-          }
-          break;
+          case 1:
+            {
+              _bgColor = Colors.lightGreen[600];
+              _buttonColor = Colors.red[300];
+            }
+            break;
 
-          case 2: {
-            _bgColor = Colors.orange[400]; _buttonColor = Colors.blue[300];
-          }
-          break;
+          case 2:
+            {
+              _bgColor = Colors.orange[400];
+              _buttonColor = Colors.blue[300];
+            }
+            break;
 
-          case 3: {
-            _bgColor = Colors.red[400]; _buttonColor = Colors.pink[300];
-          }
-          break;
+          case 3:
+            {
+              _bgColor = Colors.red[400];
+              _buttonColor = Colors.pink[300];
+            }
+            break;
 
           case 0:
-          default: {
-            _bgColor = Colors.lightBlue[600]; _buttonColor = Colors.deepOrange[300];
-          }
-          break;
-
+          default:
+            {
+              _bgColor = Colors.lightBlue[600];
+              _buttonColor = Colors.deepOrange[300];
+            }
+            break;
         }
       });
     });
@@ -135,27 +159,34 @@ class HomeState extends State<Home> {
         _quoteToWrite = text;
         Random random = Random();
         switch (random.nextInt(4)) {
-          case 1: {
-            _bgColor = Colors.lightGreen[600]; _buttonColor = Colors.red[300];
-          }
-          break;
+          case 1:
+            {
+              _bgColor = Colors.lightGreen[600];
+              _buttonColor = Colors.red[300];
+            }
+            break;
 
-          case 2: {
-            _bgColor = Colors.orange[400]; _buttonColor = Colors.blue[300];
-          }
-          break;
+          case 2:
+            {
+              _bgColor = Colors.orange[400];
+              _buttonColor = Colors.blue[300];
+            }
+            break;
 
-          case 3: {
-            _bgColor = Colors.red[400]; _buttonColor = Colors.pink[300];
-          }
-          break;
+          case 3:
+            {
+              _bgColor = Colors.red[400];
+              _buttonColor = Colors.pink[300];
+            }
+            break;
 
           case 0:
-          default: {
-            _bgColor = Colors.lightBlue[600]; _buttonColor = Colors.deepOrange[300];
-          }
-          break;
-
+          default:
+            {
+              _bgColor = Colors.lightBlue[600];
+              _buttonColor = Colors.deepOrange[300];
+            }
+            break;
         }
       });
     });
