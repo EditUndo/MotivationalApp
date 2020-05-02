@@ -59,7 +59,7 @@ class HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NoteSet()),
+                  MaterialPageRoute(builder: (context) => NoteSetStateful()),
                 );
               },
             ),
