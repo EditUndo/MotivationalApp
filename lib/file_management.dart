@@ -13,11 +13,10 @@ class FileManagement {
     Random _random = new Random();
 
     return lines[_random.nextInt(lines.length)];
-
   }
+
   static Future<String> readFile(String fileName) async {
     return await rootBundle.loadString(fileName);
   }
 
 }
-
