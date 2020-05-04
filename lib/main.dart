@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'file_management.dart';
+import 'database_management.dart';
+import 'quote.dart';
 
 void main() => runApp(MotivationApp());
 
@@ -24,13 +26,34 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-  final _savedQuotes = Set<String>();
-  String _quoteToWrite = "";
+  Quote _quoteToWrite = Quote("", "", 0);
   final _biggerFont = const TextStyle(fontSize: 20.0);
   final _smallerFont = const TextStyle(fontSize: 18.0, color: Colors.white);
+  DatabaseHelper _db = DatabaseHelper();
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+        future: _db.isQuoteSaved(_quoteToWrite.id),
+        builder: (context, AsyncSnapshot snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Container(); // empty or show a placeholder
+            case ConnectionState.active:
+            case ConnectionState.waiting:
+              return Text('Loading ...');
+            case ConnectionState.done:
+            default:
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
+              print(snapshot.data);
+              return _buildPage(snapshot.data);
+          }
+        });
+  }
+
+  Widget _buildPage(bool alreadySaved) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Motivation'),
@@ -38,7 +61,7 @@ class HomeState extends State<Home> {
       backgroundColor: Colors.blueGrey[600],
       body: Container(
         alignment: Alignment.topCenter,
-        child: _buildQuote(),
+        child: _buildQuote(alreadySaved),
       ),
       floatingActionButton: _buildButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -65,10 +88,8 @@ class HomeState extends State<Home> {
     );
   }
 
-  Widget _buildQuote() {
+  Widget _buildQuote(bool alreadySaved) {
     //add favorite button
-    bool alreadySaved = _savedQuotes.contains(_quoteToWrite);
-
     return Container(
       alignment: Alignment(0.0, -0.3),
       child: Container(
@@ -108,7 +129,7 @@ class HomeState extends State<Home> {
           child: ListTile(
             title: new Center(
               child: new Text(
-                _quoteToWrite,
+                _quoteToWrite.quote,
                 style: _biggerFont,
               ),
             ),
@@ -117,13 +138,19 @@ class HomeState extends State<Home> {
               color: alreadySaved ? Colors.red : null,
             ),
             onTap: () {
-              setState(() {
                 if (alreadySaved) {
-                  _savedQuotes.remove(_quoteToWrite);
+                  _db.unsaveQuote(_quoteToWrite.id).then((_) {
+                    setState(() {
+                      
+                    });
+                  });
                 } else {
-                  _savedQuotes.add(_quoteToWrite);
+                  _db.saveQuote(_quoteToWrite.id).then((_) {
+                    setState(() {
+                      
+                    });
+                  });
                 }
-              });
             },
           ),
         ),
@@ -150,26 +177,28 @@ class HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _getRandomQuote().then((String text) {
+    _getRandomQuote().then((Quote randQuote) {
       setState(() {
-        _quoteToWrite = text;
+        _quoteToWrite = randQuote;
       });
     });
   }
 
   void _updateQuote() {
-    _getRandomQuote().then((String text) {
+    _getRandomQuote().then((Quote randQuote) {
       setState(() {
-        _quoteToWrite = text;
+        _quoteToWrite = randQuote;
       });
     });
   }
 
-  Future<String> _getRandomQuote() {
-    return FileManagement.readRandomFileLine('assets/data/quotes.txt');
+  Future<Quote> _getRandomQuote() {
+    //return FileManagement.readRandomFileLine('assets/data/quotes.txt');
+    return _db.getRandomQuote();
   }
 
-  Widget _buildSavedItem(BuildContext context, int index) {
+  Widget _buildSavedItem(
+      BuildContext context, List<Quote> savedQuotes, int index) {
     return Center(
       child: Container(
         color: Colors.transparent,
@@ -207,14 +236,15 @@ class HomeState extends State<Home> {
           child: ListTile(
             title: new Center(
               child: new Text(
-                _savedQuotes.elementAt(index),
+                savedQuotes.elementAt(index).quote,
                 style: _biggerFont,
               ),
             ),
             onLongPress: () {
-              _savedQuotes.remove(_savedQuotes.elementAt(index));
-              Navigator.of(context).pop();
-              _pushSaved();
+              _db.unsaveQuote(savedQuotes.elementAt(index).id).then((_) {
+                Navigator.of(context).pop();
+                _pushSaved();
+              });
             },
           ),
         ),
@@ -223,25 +253,27 @@ class HomeState extends State<Home> {
   }
 
   void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Quotes'),
-            ),
-            backgroundColor: Colors.blueGrey[600],
-            body: ListView.separated(
-              itemCount: _savedQuotes.length,
-              itemBuilder: (BuildContext context, int index) =>
-                  _buildSavedItem(context, index),
-              separatorBuilder: (context, index) => Divider(
-                  //color: Colors.black,
-                  ),
-            ),
-          );
-        },
-      ),
-    );
+    _db.getSavedQuotes().then((List<Quote> savedQuotes) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Saved Quotes'),
+              ),
+              backgroundColor: Colors.blueGrey[600],
+              body: ListView.separated(
+                itemCount: savedQuotes.length,
+                itemBuilder: (BuildContext context, int index) =>
+                    _buildSavedItem(context, savedQuotes, index),
+                separatorBuilder: (context, index) => Divider(
+                    //color: Colors.black,
+                    ),
+              ),
+            );
+          },
+        ),
+      );
+    });
   }
 }
