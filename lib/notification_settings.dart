@@ -50,6 +50,7 @@ class NoteSet extends State<NoteSetStateful> {
                     const SizedBox(height: 20.0),
                     new RaisedButton(
                       child: const Text('UNSCHEDULE'),
+                      //TODO figure out unscheduling
                       onPressed: null,
                     ),
                   ],
