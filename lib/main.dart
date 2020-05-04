@@ -33,24 +33,7 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-        future: _db.isQuoteSaved(_quoteToWrite.id),
-        builder: (context, AsyncSnapshot snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Container(); // empty or show a placeholder
-            case ConnectionState.active:
-            case ConnectionState.waiting:
-              return Text('Loading ...');
-            case ConnectionState.done:
-            default:
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-              print(snapshot.data);
-              return _buildPage(snapshot.data);
-          }
-        });
+        return _buildPage(_quoteToWrite.saved == 1);
   }
 
   Widget _buildPage(bool alreadySaved) {
@@ -141,13 +124,13 @@ class HomeState extends State<Home> {
                 if (alreadySaved) {
                   _db.unsaveQuote(_quoteToWrite.id).then((_) {
                     setState(() {
-                      
+                      _quoteToWrite.saved = 0;
                     });
                   });
                 } else {
                   _db.saveQuote(_quoteToWrite.id).then((_) {
                     setState(() {
-                      
+                      _quoteToWrite.saved = 1;
                     });
                   });
                 }
