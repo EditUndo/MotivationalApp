@@ -122,17 +122,17 @@ class HomeState extends State<Home> {
             ),
             onTap: () {
                 if (alreadySaved) {
-                  _db.unsaveQuote(_quoteToWrite.id).then((_) {
+                 /* _db.unsaveQuote(_quoteToWrite.id).then((_) {
                     setState(() {
                       _quoteToWrite.saved = 0;
                     });
-                  });
+                  });*/
                 } else {
-                  _db.saveQuote(_quoteToWrite.id).then((_) {
+                  /*_db.saveQuote(_quoteToWrite.id).then((_) {
                     setState(() {
                       _quoteToWrite.saved = 1;
                     });
-                  });
+                  });*/
                 }
             },
           ),
@@ -150,7 +150,7 @@ class HomeState extends State<Home> {
             borderRadius: new BorderRadius.circular(18.0),
             side: BorderSide(color: Colors.black12)),
         child: Text('Press For Quotes'),
-        onPressed: _updateQuote,
+        //onPressed: _updateQuote,
         textColor: Colors.black,
         color: Colors.grey[400],
       ),
@@ -160,25 +160,32 @@ class HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    //_db.getData();
+    _db.getRandomQuote().then((Quote randQuote) {
+      setState(() {
+        _quoteToWrite = randQuote;
+      });
+    });
+    //_quoteToWrite = new Quote(_db.getRandomQuote(), "Test", 0);
+    /*_getRandomQuote().then((Quote randQuote) {
+      setState(() {
+        _quoteToWrite = randQuote;
+      });
+    });*/
+  }
+
+  /*void _updateQuote() {
     _getRandomQuote().then((Quote randQuote) {
       setState(() {
         _quoteToWrite = randQuote;
       });
     });
-  }
+  }*/
 
-  void _updateQuote() {
-    _getRandomQuote().then((Quote randQuote) {
-      setState(() {
-        _quoteToWrite = randQuote;
-      });
-    });
-  }
-
-  Future<Quote> _getRandomQuote() {
+  /*Future<Quote> _getRandomQuote() {
     //return FileManagement.readRandomFileLine('assets/data/quotes.txt');
     return _db.getRandomQuote();
-  }
+  }*/
 
   Widget _buildSavedItem(
       BuildContext context, List<Quote> savedQuotes, int index) {
@@ -224,10 +231,10 @@ class HomeState extends State<Home> {
               ),
             ),
             onLongPress: () {
-              _db.unsaveQuote(savedQuotes.elementAt(index).id).then((_) {
+              /*_db.unsaveQuote(savedQuotes.elementAt(index).id).then((_) {
                 Navigator.of(context).pop();
                 _pushSaved();
-              });
+              });*/
             },
           ),
         ),
@@ -236,7 +243,7 @@ class HomeState extends State<Home> {
   }
 
   void _pushSaved() {
-    _db.getSavedQuotes().then((List<Quote> savedQuotes) {
+    /*_db.getSavedQuotes().then((List<Quote> savedQuotes) {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
@@ -257,6 +264,6 @@ class HomeState extends State<Home> {
           },
         ),
       );
-    });
+    });*/
   }
 }

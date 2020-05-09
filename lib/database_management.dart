@@ -1,13 +1,39 @@
-import 'package:sqflite/sqflite.dart';
+//import 'package:sqflite/sqflite.dart';
 import 'dart:async';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'dart:math';
 import 'quote.dart';
 import 'file_management.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseHelper {
   static DatabaseHelper _databaseHelper; // Singleton DatabaseHelper
-  static Database _database; // Singleton Database
+  final databaseReference = Firestore.instance;
+  final _random = new Random();
+
+  void getData() {
+    databaseReference
+        .collection("quotes")
+        .getDocuments()
+        .then((QuerySnapshot snapshot) {
+      snapshot.documents.forEach((f) => print('${f.data}}'));
+    });
+  }
+
+  Future<Quote> getRandomQuote() async {
+    String quote = "";
+    String author = "";
+    int saved = 0;
+    QuerySnapshot snapshot = await databaseReference.collection("quotes").getDocuments();
+    
+    quote = snapshot.documents[_random.nextInt(snapshot.documents.length)].data.values.first.toString();
+    author = snapshot.documents[_random.nextInt(snapshot.documents.length)].data.values.elementAt(1).toString();
+    Quote result = new Quote(quote, author, saved);
+    print(quote);
+    return result;
+  }
+
+  /*static Database _database; // Singleton Database
 
   String quoteTable = 'quote_table';
   String colId = 'id';
@@ -36,14 +62,16 @@ class DatabaseHelper {
 
   Future<Database> initializeDatabase() async {
     // Get the directory path for both Android and iOS to store database.
-    Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path + 'quoteDatabase.db';
+    //Directory directory = await getApplicationDocumentsDirectory();
+    String path = 'assets/data/quoteDatabase.db';
 
     print("Initializing Database");
 
     // Open/create the database at a given path
-    var quotesDatabase =
+    /*var quotesDatabase =
         await openDatabase(path, version: 1, onCreate: _createDb);
+        */
+    var quotesDatabase = await rootBundle.load(path) as Future<Database>;
     return quotesDatabase;
   }
 
@@ -87,8 +115,7 @@ class DatabaseHelper {
   // Delete Operation: Delete a quote object from database
   Future<int> deleteQuote(int id) async {
     var db = await this.database;
-    int result = await db
-        .rawDelete("DELETE FROM $quoteTable WHERE $colId=$id");
+    int result = await db.rawDelete("DELETE FROM $quoteTable WHERE $colId=$id");
     return result;
   }
 
@@ -121,8 +148,8 @@ class DatabaseHelper {
     Database db = await this.database;
 
 //		var result = await db.rawQuery('SELECT * FROM $quoteTable order by $colTitle ASC');
-    var queryResult = await db.rawQuery(
-        'SELECT * FROM $quoteTable WHERE $colSaved=1');
+    var queryResult =
+        await db.rawQuery('SELECT * FROM $quoteTable WHERE $colSaved=1');
     return queryResult;
   }
 
@@ -144,15 +171,13 @@ class DatabaseHelper {
   Future<void> saveQuote(int id) async {
     Database db = await this.database;
 
-    await db.rawQuery(
-        "UPDATE $quoteTable SET $colSaved=1 WHERE $colId=$id");
+    await db.rawQuery("UPDATE $quoteTable SET $colSaved=1 WHERE $colId=$id");
   }
 
   Future<void> unsaveQuote(int id) async {
     Database db = await this.database;
 
-    await db.rawQuery(
-        "UPDATE $quoteTable SET $colSaved=0 WHERE $colId=$id");
+    await db.rawQuery("UPDATE $quoteTable SET $colSaved=0 WHERE $colId=$id");
   }
 
   Future<bool> isQuoteSaved(int id) async {
@@ -160,14 +185,13 @@ class DatabaseHelper {
     Quote grabbedQuote = Quote("", "", 0);
 
 //		var result = await db.rawQuery('SELECT * FROM $quoteTable order by $colTitle ASC');
-    var queryResult = await db.rawQuery(
-        "SELECT * FROM $quoteTable WHERE $colSaved=1 AND $colId=$id");
-      
+    var queryResult = await db
+        .rawQuery("SELECT * FROM $quoteTable WHERE $colSaved=1 AND $colId=$id");
 
-    if (queryResult.length > 0) grabbedQuote = Quote.fromMapObject(queryResult[0]);
+    if (queryResult.length > 0)
+      grabbedQuote = Quote.fromMapObject(queryResult[0]);
 
-    if (grabbedQuote.saved == null)
-      return false;
+    if (grabbedQuote.saved == null) return false;
 
     return (grabbedQuote.saved == 1);
   }
@@ -182,5 +206,5 @@ class DatabaseHelper {
     if (queryResult.length > 0) quote = Quote.fromMapObject(queryResult[0]);
 
     return quote;
-  }
+  }*/
 }
