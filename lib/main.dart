@@ -172,6 +172,11 @@ class HomeState extends State<Home> {
     _db.getRandomQuote().then((Quote randQuote) {
       setState(() {
         _quoteToWrite = randQuote;
+        _db.isQuoteSaved(_quoteToWrite.cloudId).then((bool isSaved) {
+          setState(() {
+            _quoteSaved = isSaved;
+          });
+        });
       });
     });
   }

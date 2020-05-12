@@ -69,7 +69,6 @@ class DatabaseHelper {
 		String path = directory.path + 'savedQuotes.db';
 
     print("Initializing Database");
-    await deleteDatabase(path);
 
     // Open/create the database at a given path
     var quotesDatabase =
@@ -142,8 +141,8 @@ class DatabaseHelper {
 
 //		var result = await db.rawQuery('SELECT * FROM $quoteTable order by $colTitle ASC');
     var queryResult = await db
-        .rawQuery("SELECT * FROM $quoteTable WHERE $colCloudId=$cloudId");
+        .rawQuery("SELECT * FROM $quoteTable");
 
-    return queryResult.length > 0;
+    return queryResult.contains(cloudId);
   }
 }
