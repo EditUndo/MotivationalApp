@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:motivation_app/notification_settings.dart';
 import 'file_management.dart';
+import 'notification_settings.dart';
 import 'database_management.dart';
 import 'quote.dart';
 
@@ -61,6 +63,12 @@ class HomeState extends State<Home> {
             ),
             ListTile(
               title: Text('Notification Settings'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NoteSetStateful()),
+                );
+              },
             ),
             ListTile(
               title: Text('Saved Quotes'),
