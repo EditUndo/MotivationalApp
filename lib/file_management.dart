@@ -17,7 +17,7 @@ class FileManagement {
     return await rootBundle.loadString(fileName);
   }
 
-  static Future<List<Quote>> readFileLines(String fileName) async {
+  /*static Future<List<Quote>> readFileLines(String fileName) async {
     String fullText = await rootBundle.loadString(fileName);
     List<String> lines = fullText.split("\n");
     List<Quote> quotes = List<Quote>();
@@ -26,10 +26,10 @@ class FileManagement {
       if (splitQuote.length == 2) {
         String quoteText = splitQuote[0];
         String authorText = splitQuote[1];
-        quotes.add(Quote(quoteText, authorText, 0));
+        quotes.add(Quote(quoteText, authorText, ""));
       }
     }
 
     return quotes;
-  }
+  }*/
 }

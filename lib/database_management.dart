@@ -1,4 +1,7 @@
-//import 'package:sqflite/sqflite.dart';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:math';
 import 'quote.dart';
@@ -23,25 +26,25 @@ class DatabaseHelper {
   Future<Quote> getRandomQuote() async {
     String quote = "";
     String author = "";
-    int saved = 0;
+    String cloudId = "";
     QuerySnapshot snapshot = await databaseReference.collection("quotes").getDocuments();
     
     quote = snapshot.documents[_random.nextInt(snapshot.documents.length)].data.values.first.toString();
     author = snapshot.documents[_random.nextInt(snapshot.documents.length)].data.values.elementAt(1).toString();
-    Quote result = new Quote(quote, author, saved);
+    cloudId = snapshot.documents[_random.nextInt(snapshot.documents.length)].documentID;
+    Quote result = new Quote(quote, author, cloudId);
     print(quote);
     return result;
   }
 
-  /*static Database _database; // Singleton Database
+  static Database _database; // Singleton Database
 
-  String quoteTable = 'quote_table';
+  String quoteTable = 'saved_quotes';
   String colId = 'id';
   String colAuthor = 'author';
   String colQuote = 'quote';
-  String colDate = 'date';
-  String colSaved = 'saved';
-  String colTimesSeen = 'times_seen';
+  String colCloudId = "cloud_id";
+
 
   DatabaseHelper._createInstance(); // Named constructor to create instance of DatabaseHelper
 
@@ -62,16 +65,16 @@ class DatabaseHelper {
 
   Future<Database> initializeDatabase() async {
     // Get the directory path for both Android and iOS to store database.
-    //Directory directory = await getApplicationDocumentsDirectory();
-    String path = 'assets/data/quoteDatabase.db';
+    Directory directory = await getApplicationDocumentsDirectory();
+		String path = directory.path + 'savedQuotes.db';
 
     print("Initializing Database");
+    await deleteDatabase(path);
 
     // Open/create the database at a given path
-    /*var quotesDatabase =
+    var quotesDatabase =
         await openDatabase(path, version: 1, onCreate: _createDb);
-        */
-    var quotesDatabase = await rootBundle.load(path) as Future<Database>;
+
     return quotesDatabase;
   }
 
@@ -79,21 +82,11 @@ class DatabaseHelper {
     await db
         .execute(
             'CREATE TABLE $quoteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colAuthor TEXT, '
-            '$colQuote TEXT, $colDate TEXT, $colSaved INTEGER, $colTimesSeen INTEGER)')
+            '$colQuote TEXT, $colCloudId TEXT)')
         .then((_) {
-      _addQuotesToDB();
     });
 
     print("Created Database");
-  }
-
-  void _addQuotesToDB() async {
-    FileManagement.readFileLines('assets/data/quotes.txt')
-        .then((List<Quote> allQuotes) {
-      for (int i = 0; i < allQuotes.length; i++) {
-        insertQuote(allQuotes.elementAt(i));
-      }
-    });
   }
 
   // Fetch Operation: Get all quote objects from database
@@ -102,6 +95,7 @@ class DatabaseHelper {
 
 //		var result = await db.rawQuery('SELECT * FROM $quoteTable order by $colTitle ASC');
     var result = await db.query(quoteTable, orderBy: '$colAuthor ASC');
+    print(result);
     return result;
   }
 
@@ -113,9 +107,9 @@ class DatabaseHelper {
   }
 
   // Delete Operation: Delete a quote object from database
-  Future<int> deleteQuote(int id) async {
+  Future<int> deleteQuote(String cloudId) async {
     var db = await this.database;
-    int result = await db.rawDelete("DELETE FROM $quoteTable WHERE $colId=$id");
+    int result = await db.rawDelete("DELETE FROM $quoteTable WHERE $colCloudId=$cloudId");
     return result;
   }
 
@@ -143,68 +137,13 @@ class DatabaseHelper {
     return quoteList;
   }
 
-  // Fetch Operation: Get all quote objects from database
-  Future<List<Map<String, dynamic>>> getSavedQuoteMapList() async {
+  Future<bool> isQuoteSaved(String cloudId) async {
     Database db = await this.database;
 
 //		var result = await db.rawQuery('SELECT * FROM $quoteTable order by $colTitle ASC');
-    var queryResult =
-        await db.rawQuery('SELECT * FROM $quoteTable WHERE $colSaved=1');
-    return queryResult;
-  }
-
-  Future<List<Quote>> getSavedQuotes() async {
-    var quoteMapList =
-        await getSavedQuoteMapList(); // Get 'Map List' from database
-    int count =
-        quoteMapList.length; // Count the number of map entries in db table
-
-    List<Quote> quoteList = List<Quote>();
-    // For loop to create a 'quote List' from a 'Map List'
-    for (int i = 0; i < count; i++) {
-      quoteList.add(Quote.fromMapObject(quoteMapList[i]));
-    }
-
-    return quoteList;
-  }
-
-  Future<void> saveQuote(int id) async {
-    Database db = await this.database;
-
-    await db.rawQuery("UPDATE $quoteTable SET $colSaved=1 WHERE $colId=$id");
-  }
-
-  Future<void> unsaveQuote(int id) async {
-    Database db = await this.database;
-
-    await db.rawQuery("UPDATE $quoteTable SET $colSaved=0 WHERE $colId=$id");
-  }
-
-  Future<bool> isQuoteSaved(int id) async {
-    Database db = await this.database;
-    Quote grabbedQuote = Quote("", "", 0);
-
-//		var result = await db.rawQuery('SELECT * FROM $quoteTable order by $colTitle ASC');
     var queryResult = await db
-        .rawQuery("SELECT * FROM $quoteTable WHERE $colSaved=1 AND $colId=$id");
+        .rawQuery("SELECT * FROM $quoteTable WHERE $colCloudId=$cloudId");
 
-    if (queryResult.length > 0)
-      grabbedQuote = Quote.fromMapObject(queryResult[0]);
-
-    if (grabbedQuote.saved == null) return false;
-
-    return (grabbedQuote.saved == 1);
+    return queryResult.length > 0;
   }
-
-  Future<Quote> getRandomQuote() async {
-    Database db = await this.database;
-    Quote quote = Quote("", "", 0);
-
-    var queryResult = await db
-        .rawQuery('SELECT * FROM $quoteTable order by RANDOM() LIMIT 1');
-
-    if (queryResult.length > 0) quote = Quote.fromMapObject(queryResult[0]);
-
-    return quote;
-  }*/
 }

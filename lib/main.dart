@@ -26,14 +26,15 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-  Quote _quoteToWrite = Quote("", "", 0);
+  Quote _quoteToWrite = Quote("", "", "");
+  bool _quoteSaved = false;
   final _biggerFont = const TextStyle(fontSize: 20.0);
   final _smallerFont = const TextStyle(fontSize: 18.0, color: Colors.white);
   DatabaseHelper _db = DatabaseHelper();
 
   @override
   Widget build(BuildContext context) {
-        return _buildPage(_quoteToWrite.saved == 1);
+        return _buildPage(_quoteSaved);
   }
 
   Widget _buildPage(bool alreadySaved) {
@@ -122,17 +123,17 @@ class HomeState extends State<Home> {
             ),
             onTap: () {
                 if (alreadySaved) {
-                 /* _db.unsaveQuote(_quoteToWrite.id).then((_) {
+                  _db.deleteQuote(_quoteToWrite.cloudId).then((_) {
                     setState(() {
-                      _quoteToWrite.saved = 0;
+                      _quoteSaved = false;
                     });
-                  });*/
+                  });
                 } else {
-                  /*_db.saveQuote(_quoteToWrite.id).then((_) {
+                  _db.insertQuote(_quoteToWrite).then((_) {
                     setState(() {
-                      _quoteToWrite.saved = 1;
+                      _quoteSaved = true;
                     });
-                  });*/
+                  });
                 }
             },
           ),
@@ -150,7 +151,7 @@ class HomeState extends State<Home> {
             borderRadius: new BorderRadius.circular(18.0),
             side: BorderSide(color: Colors.black12)),
         child: Text('Press For Quotes'),
-        //onPressed: _updateQuote,
+        onPressed: _updateQuote,
         textColor: Colors.black,
         color: Colors.grey[400],
       ),
@@ -160,32 +161,20 @@ class HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    //_db.getData();
     _db.getRandomQuote().then((Quote randQuote) {
       setState(() {
         _quoteToWrite = randQuote;
       });
     });
-    //_quoteToWrite = new Quote(_db.getRandomQuote(), "Test", 0);
-    /*_getRandomQuote().then((Quote randQuote) {
-      setState(() {
-        _quoteToWrite = randQuote;
-      });
-    });*/
   }
 
-  /*void _updateQuote() {
-    _getRandomQuote().then((Quote randQuote) {
+  void _updateQuote() {
+    _db.getRandomQuote().then((Quote randQuote) {
       setState(() {
         _quoteToWrite = randQuote;
       });
     });
-  }*/
-
-  /*Future<Quote> _getRandomQuote() {
-    //return FileManagement.readRandomFileLine('assets/data/quotes.txt');
-    return _db.getRandomQuote();
-  }*/
+  }
 
   Widget _buildSavedItem(
       BuildContext context, List<Quote> savedQuotes, int index) {
@@ -231,10 +220,10 @@ class HomeState extends State<Home> {
               ),
             ),
             onLongPress: () {
-              /*_db.unsaveQuote(savedQuotes.elementAt(index).id).then((_) {
+              _db.deleteQuote(savedQuotes.elementAt(index).cloudId).then((_) {
                 Navigator.of(context).pop();
                 _pushSaved();
-              });*/
+              });
             },
           ),
         ),
@@ -243,7 +232,7 @@ class HomeState extends State<Home> {
   }
 
   void _pushSaved() {
-    /*_db.getSavedQuotes().then((List<Quote> savedQuotes) {
+    _db.getQuoteList().then((List<Quote> savedQuotes) {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
@@ -264,6 +253,6 @@ class HomeState extends State<Home> {
           },
         ),
       );
-    });*/
+    });
   }
 }

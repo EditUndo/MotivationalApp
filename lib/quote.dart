@@ -2,15 +2,13 @@ class Quote {
 
   String _quote;
   String _author;
-  int _id;
-  int _saved;
+  String _cloudId;
 
-  Quote(this._quote, this._author, this._saved, [this._id]);
+  Quote(this._quote, this._author, this._cloudId);
 
   String get quote => _quote;
   String get author => _author;
-  int get saved => _saved;
-  int get id => _id;
+  String get cloudId => _cloudId;
 
   set quote(String newQuote) {
     if (newQuote.length <= 255) {
@@ -24,8 +22,10 @@ class Quote {
     }
   }
 
-  set saved(int isSaved) {
-    this._saved = isSaved;
+  set cloudId(String newID) {
+    if (newID.length <= 255) {
+      this._cloudId = newID;
+    }
   }
 
   // Convert a Quote object into a Map object
@@ -34,7 +34,7 @@ class Quote {
 		var map = Map<String, dynamic>();
 		map['quote'] = _quote;
 		map['author'] = _author;
-    map['saved'] = _saved;
+    map['cloud_id'] = _cloudId;
 
 		return map;
 	}
@@ -43,8 +43,7 @@ class Quote {
 	Quote.fromMapObject(Map<String, dynamic> map) {
 		this._quote = map['quote'];
 		this._author = map['author'];
-    this._saved = map['saved'];
-    this._id = map['id'];
+    this._cloudId = map['cloud_id'];
 	}
 
 }
