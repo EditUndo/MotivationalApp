@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "203150777844",
+    "firebase_url": "https://motivation-app-7be44.firebaseio.com",
+    "project_id": "motivation-app-7be44",
+    "storage_bucket": "motivation-app-7be44.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203150777844:android:ecb1bddf0fd5039d52eda1",
+        "android_client_info": {
+          "package_name": "com.mirthllc.motivation_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203150777844-qdk7092j79jubatl3fs9434scndcfdou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA3d0hM5HFA4ycV7W2h8_EUV8Cq6-xunw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203150777844-qdk7092j79jubatl3fs9434scndcfdou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
