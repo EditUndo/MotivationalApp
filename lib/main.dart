@@ -36,7 +36,7 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-        return _buildPage(_quoteSaved);
+    return _buildPage(_quoteSaved);
   }
 
   Widget _buildPage(bool alreadySaved) {
@@ -130,19 +130,29 @@ class HomeState extends State<Home> {
               color: alreadySaved ? Colors.red : null,
             ),
             onTap: () {
-                if (alreadySaved) {
-                  _db.deleteQuote(_quoteToWrite.cloudId).then((_) {
-                    setState(() {
-                      _quoteSaved = false;
+              if (alreadySaved) {
+                _db.deleteQuote(_quoteToWrite.quote).then((_) {
+                  setState(() {
+                    _db.isQuoteSaved(_quoteToWrite.quote)
+                        .then((bool isSaved) {
+                      setState(() {
+                        _quoteSaved = isSaved;
+                      });
                     });
                   });
-                } else {
-                  _db.insertQuote(_quoteToWrite).then((_) {
-                    setState(() {
-                      _quoteSaved = true;
+                });
+              } else {
+                _db.insertQuote(_quoteToWrite).then((_) {
+                  setState(() {
+                    _db.isQuoteSaved(_quoteToWrite.quote)
+                        .then((bool isSaved) {
+                      setState(() {
+                        _quoteSaved = isSaved;
+                      });
                     });
                   });
-                }
+                });
+              }
             },
           ),
         ),
@@ -172,7 +182,7 @@ class HomeState extends State<Home> {
     _db.getRandomQuote().then((Quote randQuote) {
       setState(() {
         _quoteToWrite = randQuote;
-        _db.isQuoteSaved(_quoteToWrite.cloudId).then((bool isSaved) {
+        _db.isQuoteSaved(_quoteToWrite.quote).then((bool isSaved) {
           setState(() {
             _quoteSaved = isSaved;
           });
@@ -185,6 +195,11 @@ class HomeState extends State<Home> {
     _db.getRandomQuote().then((Quote randQuote) {
       setState(() {
         _quoteToWrite = randQuote;
+        _db.isQuoteSaved(_quoteToWrite.quote).then((bool isSaved) {
+          setState(() {
+            _quoteSaved = isSaved;
+          });
+        });
       });
     });
   }
@@ -233,7 +248,12 @@ class HomeState extends State<Home> {
               ),
             ),
             onLongPress: () {
-              _db.deleteQuote(savedQuotes.elementAt(index).cloudId).then((_) {
+              _db.deleteQuote(savedQuotes.elementAt(index).quote).then((_) {
+                _db.isQuoteSaved(_quoteToWrite.quote).then((bool isSaved) {
+                  setState(() {
+                    _quoteSaved = isSaved;
+                  });
+                });
                 Navigator.of(context).pop();
                 _pushSaved();
               });

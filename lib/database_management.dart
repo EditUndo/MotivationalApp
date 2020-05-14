@@ -33,7 +33,7 @@ class DatabaseHelper {
     author = snapshot.documents[_random.nextInt(snapshot.documents.length)].data.values.elementAt(1).toString();
     cloudId = snapshot.documents[_random.nextInt(snapshot.documents.length)].documentID;
     Quote result = new Quote(quote, author, cloudId);
-    print(quote);
+    
     return result;
   }
 
@@ -68,8 +68,6 @@ class DatabaseHelper {
     Directory directory = await getApplicationDocumentsDirectory();
 		String path = directory.path + 'savedQuotes.db';
 
-    print("Initializing Database");
-
     // Open/create the database at a given path
     var quotesDatabase =
         await openDatabase(path, version: 1, onCreate: _createDb);
@@ -84,8 +82,6 @@ class DatabaseHelper {
             '$colQuote TEXT, $colCloudId TEXT)')
         .then((_) {
     });
-
-    print("Created Database");
   }
 
   // Fetch Operation: Get all quote objects from database
@@ -106,9 +102,9 @@ class DatabaseHelper {
   }
 
   // Delete Operation: Delete a quote object from database
-  Future<int> deleteQuote(String cloudId) async {
+  Future<int> deleteQuote(String quote) async {
     var db = await this.database;
-    int result = await db.rawDelete("DELETE FROM $quoteTable WHERE $colCloudId=$cloudId");
+    int result = await db.delete(quoteTable, where: "$colQuote = ?", whereArgs: [quote]);
     return result;
   }
 
@@ -136,13 +132,13 @@ class DatabaseHelper {
     return quoteList;
   }
 
-  Future<bool> isQuoteSaved(String cloudId) async {
+  Future<bool> isQuoteSaved(String quote) async {
     Database db = await this.database;
 
 //		var result = await db.rawQuery('SELECT * FROM $quoteTable order by $colTitle ASC');
     var queryResult = await db
-        .rawQuery("SELECT * FROM $quoteTable");
+        .rawQuery('SELECT * FROM $quoteTable WHERE $colQuote="$quote"');
 
-    return queryResult.contains(cloudId);
+    return queryResult.isNotEmpty;
   }
 }
